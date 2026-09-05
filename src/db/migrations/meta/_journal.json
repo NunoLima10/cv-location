@@ -8,6 +8,13 @@
       "when": 1786803764902,
       "tag": "0000_early_bulldozer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788642836376,
+      "tag": "0001_colossal_ricochet",
+      "breakpoints": true
     }
   ]
 }
