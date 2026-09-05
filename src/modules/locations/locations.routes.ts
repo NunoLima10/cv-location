@@ -8,6 +8,7 @@ import {
   getPlace,
   getZone,
   getLocationByCode,
+  getLocationStats,
   listCountries,
   listIslands,
   listMunicipalities,
@@ -69,6 +70,13 @@ export async function locationsRoutes(server: FastifyInstance) {
   server.get('/places/:code', {
     schema: getPlace,
     handler: locationsControllers.getPlace,
+  });
+
+  // Static seed-data counts per level (see LOCATION_STATS). Declared before the
+  // `:code` route so `/locations/stats` never falls through to the resolver.
+  server.get('/locations/stats', {
+    schema: getLocationStats,
+    handler: locationsControllers.getLocationStats,
   });
 
   // Resolve any code to its location, whatever the level.

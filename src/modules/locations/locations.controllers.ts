@@ -1,8 +1,9 @@
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from '@/utils/custom.errors';
 import { buildPaginationMeta } from '@/shared/schemas';
 import { locationsServices } from './locations.services';
+import { LOCATION_STATS, LOCATION_STATS_TOTAL } from './locations.constants';
 import {
   GetCountryRequest,
   GetIslandRequest,
@@ -18,6 +19,12 @@ import {
   ListPlacesRequest,
   ListZonesRequest,
 } from './locations.schemas';
+
+async function getLocationStats(_req: FastifyRequest, reply: FastifyReply) {
+  return reply.code(StatusCodes.OK).send({
+    data: { total: LOCATION_STATS_TOTAL, ...LOCATION_STATS },
+  });
+}
 
 async function getLocationByCode(
   req: GetLocationByCodeRequest,
@@ -189,6 +196,7 @@ async function getPlace(req: GetPlaceRequest, reply: FastifyReply) {
 }
 
 export const locationsControllers = {
+  getLocationStats,
   getLocationByCode,
   listCountries,
   getCountry,
