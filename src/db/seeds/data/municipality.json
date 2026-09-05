@@ -1,0 +1,156 @@
+[
+  {
+    "name": "Ribeira Grande",
+    "code": "CV111",
+    "level": 3,
+    "lat": 17.144901,
+    "long": -25.130309
+  },
+  {
+    "name": "Paul",
+    "code": "CV112",
+    "level": 3,
+    "lat": 17.117355,
+    "long": -25.014358
+  },
+  {
+    "name": "Porto Novo",
+    "code": "CV113",
+    "level": 3,
+    "lat": 17.048736,
+    "long": -25.209349
+  },
+  {
+    "name": "São Vicente",
+    "code": "CV221",
+    "level": 3,
+    "lat": 16.852083,
+    "long": -24.966695
+  },
+  {
+    "name": "Ribeira Brava",
+    "code": "CV331",
+    "level": 3,
+    "lat": 16.61714,
+    "long": -24.297329
+  },
+  {
+    "name": "Tarrafal de São Nicolau",
+    "code": "CV332",
+    "level": 3,
+    "lat": 16.566757,
+    "long": -24.356105
+  },
+  {
+    "name": "Sal",
+    "code": "CV441",
+    "level": 3,
+    "lat": 16.742739,
+    "long": -22.927635
+  },
+  {
+    "name": "Boa Vista",
+    "code": "CV551",
+    "level": 3,
+    "lat": 16.107304,
+    "long": -22.798245
+  },
+  {
+    "name": "Maio",
+    "code": "CV661",
+    "level": 3,
+    "lat": 15.219216,
+    "long": -23.162799
+  },
+  {
+    "name": "Tarrafal",
+    "code": "CV771",
+    "level": 3,
+    "lat": 15.276713,
+    "long": -23.74984
+  },
+  {
+    "name": "Santa Catarina",
+    "code": "CV772",
+    "level": 3,
+    "lat": 15.112808,
+    "long": -23.714902
+  },
+  {
+    "name": "Santa Cruz",
+    "code": "CV773",
+    "level": 3,
+    "lat": 15.134608,
+    "long": -23.559287
+  },
+  {
+    "name": "Praia",
+    "code": "CV774",
+    "level": 3,
+    "lat": 14.932463,
+    "long": -23.506387
+  },
+  {
+    "name": "São Domingos",
+    "code": "CV775",
+    "level": 3,
+    "lat": 15.028714,
+    "long": -23.564703
+  },
+  {
+    "name": "São Miguel",
+    "code": "CV776",
+    "level": 3,
+    "lat": 15.19502,
+    "long": -23.647234
+  },
+  {
+    "name": "São Salvador do Mundo",
+    "code": "CV777",
+    "level": 3,
+    "lat": 15.098212,
+    "long": -23.633085
+  },
+  {
+    "name": "São Lourenço dos Órgãos",
+    "code": "CV778",
+    "level": 3,
+    "lat": 15.061963,
+    "long": -23.605399
+  },
+  {
+    "name": "Ribeira Grande de Santiago",
+    "code": "CV779",
+    "level": 3,
+    "lat": 14.973067,
+    "long": -23.657771
+  },
+  {
+    "name": "Mosteiros",
+    "code": "CV881",
+    "level": 3,
+    "lat": 15.032579,
+    "long": -24.32519
+  },
+  {
+    "name": "São Filipe",
+    "code": "CV882",
+    "level": 3,
+    "lat": 14.897549,
+    "long": -24.493133
+  },
+  {
+    "name": "Santa Catarina do Fogo",
+    "code": "CV883",
+    "level": 3,
+    "lat": 14.925552,
+    "long": -24.324583
+  },
+  {
+    "name": "Brava",
+    "code": "CV991",
+    "level": 3,
+    "lat": 14.8515,
+    "long": -24.705462
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Santo Antão",
+    "code": "CV1",
+    "level": 2,
+    "lat": 17.086252,
+    "long": -25.152696
+  },
+  {
+    "name": "São Vicente",
+    "code": "CV2",
+    "level": 2,
+    "lat": 16.852083,
+    "long": -24.966695
+  },
+  {
+    "name": "São Nicolau",
+    "code": "CV3",
+    "level": 2,
+    "lat": 16.613617,
+    "long": -24.277256
+  },
+  {
+    "name": "Sal",
+    "code": "CV4",
+    "level": 2,
+    "lat": 16.742739,
+    "long": -22.927635
+  },
+  {
+    "name": "Boa Vista",
+    "code": "CV5",
+    "level": 2,
+    "lat": 16.107304,
+    "long": -22.798245
+  },
+  {
+    "name": "Maio",
+    "code": "CV6",
+    "level": 2,
+    "lat": 15.219216,
+    "long": -23.162799
+  },
+  {
+    "name": "Santiago",
+    "code": "CV7",
+    "level": 2,
+    "lat": 15.091646,
+    "long": -23.618749
+  },
+  {
+    "name": "Fogo",
+    "code": "CV8",
+    "level": 2,
+    "lat": 14.945395,
+    "long": -24.403385
+  },
+  {
+    "name": "Brava",
+    "code": "CV9",
+    "level": 2,
+    "lat": 14.8515,
+    "long": -24.705462
+  }
+]

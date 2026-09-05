@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.eslintcache
+.env
+.env.local
+*.log
+.pnpm-debug.log*
