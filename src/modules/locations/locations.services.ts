@@ -19,8 +19,37 @@ async function listCountries(db: DB, limit: number, offset: number) {
   return { result, total };
 }
 
-async function getCountryById(db: DB, id: number) {
-  return db.query.countries.findFirst({ where: eq(countries.id, id) });
+async function getCountryByCode(db: DB, code: string) {
+  return db.query.countries.findFirst({ where: eq(countries.code, code) });
+}
+
+/**
+ * Resolves a bare code (e.g. `CV11111111101`) to its location, regardless of
+ * level. Queries every table in parallel and returns the first match, tagged
+ * with its `type` so the caller can tell what it got.
+ */
+async function getLocationByCode(db: DB, code: string) {
+  const [country, island, municipality, parish, zone, place] = await Promise.all(
+    [
+      db.query.countries.findFirst({ where: eq(countries.code, code) }),
+      db.query.islands.findFirst({ where: eq(islands.code, code) }),
+      db.query.municipalities.findFirst({
+        where: eq(municipalities.code, code),
+      }),
+      db.query.parishes.findFirst({ where: eq(parishes.code, code) }),
+      db.query.zones.findFirst({ where: eq(zones.code, code) }),
+      db.query.places.findFirst({ where: eq(places.code, code) }),
+    ],
+  );
+
+  if (country) return { type: 'country' as const, ...country };
+  if (island) return { type: 'island' as const, ...island };
+  if (municipality) return { type: 'municipality' as const, ...municipality };
+  if (parish) return { type: 'parish' as const, ...parish };
+  if (zone) return { type: 'zone' as const, ...zone };
+  if (place) return { type: 'place' as const, ...place };
+
+  return undefined;
 }
 
 async function listIslands(
@@ -41,8 +70,8 @@ async function listIslands(
   return { result, total };
 }
 
-async function getIslandById(db: DB, id: number) {
-  return db.query.islands.findFirst({ where: eq(islands.id, id) });
+async function getIslandByCode(db: DB, code: string) {
+  return db.query.islands.findFirst({ where: eq(islands.code, code) });
 }
 
 async function listMunicipalities(
@@ -63,9 +92,9 @@ async function listMunicipalities(
   return { result, total };
 }
 
-async function getMunicipalityById(db: DB, id: number) {
+async function getMunicipalityByCode(db: DB, code: string) {
   return db.query.municipalities.findFirst({
-    where: eq(municipalities.id, id),
+    where: eq(municipalities.code, code),
   });
 }
 
@@ -87,8 +116,8 @@ async function listParishes(
   return { result, total };
 }
 
-async function getParishById(db: DB, id: number) {
-  return db.query.parishes.findFirst({ where: eq(parishes.id, id) });
+async function getParishByCode(db: DB, code: string) {
+  return db.query.parishes.findFirst({ where: eq(parishes.code, code) });
 }
 
 async function listZones(
@@ -109,8 +138,8 @@ async function listZones(
   return { result, total };
 }
 
-async function getZoneById(db: DB, id: number) {
-  return db.query.zones.findFirst({ where: eq(zones.id, id) });
+async function getZoneByCode(db: DB, code: string) {
+  return db.query.zones.findFirst({ where: eq(zones.code, code) });
 }
 
 async function listPlaces(
@@ -131,36 +160,43 @@ async function listPlaces(
   return { result, total };
 }
 
-async function getPlaceById(db: DB, id: number) {
-  return db.query.places.findFirst({ where: eq(places.id, id) });
+async function getPlaceByCode(db: DB, code: string) {
+  return db.query.places.findFirst({ where: eq(places.code, code) });
 }
 
 export const locationsServices = {
   listCountries: errorResolver(listCountries, 'locationsServices.listCountries'),
-  getCountryById: errorResolver(
-    getCountryById,
-    'locationsServices.getCountryById',
+  getLocationByCode: errorResolver(
+    getLocationByCode,
+    'locationsServices.getLocationByCode',
+  ),
+  getCountryByCode: errorResolver(
+    getCountryByCode,
+    'locationsServices.getCountryByCode',
   ),
   listIslands: errorResolver(listIslands, 'locationsServices.listIslands'),
-  getIslandById: errorResolver(
-    getIslandById,
-    'locationsServices.getIslandById',
+  getIslandByCode: errorResolver(
+    getIslandByCode,
+    'locationsServices.getIslandByCode',
   ),
   listMunicipalities: errorResolver(
     listMunicipalities,
     'locationsServices.listMunicipalities',
   ),
-  getMunicipalityById: errorResolver(
-    getMunicipalityById,
-    'locationsServices.getMunicipalityById',
+  getMunicipalityByCode: errorResolver(
+    getMunicipalityByCode,
+    'locationsServices.getMunicipalityByCode',
   ),
   listParishes: errorResolver(listParishes, 'locationsServices.listParishes'),
-  getParishById: errorResolver(
-    getParishById,
-    'locationsServices.getParishById',
+  getParishByCode: errorResolver(
+    getParishByCode,
+    'locationsServices.getParishByCode',
   ),
   listZones: errorResolver(listZones, 'locationsServices.listZones'),
-  getZoneById: errorResolver(getZoneById, 'locationsServices.getZoneById'),
+  getZoneByCode: errorResolver(getZoneByCode, 'locationsServices.getZoneByCode'),
   listPlaces: errorResolver(listPlaces, 'locationsServices.listPlaces'),
-  getPlaceById: errorResolver(getPlaceById, 'locationsServices.getPlaceById'),
+  getPlaceByCode: errorResolver(
+    getPlaceByCode,
+    'locationsServices.getPlaceByCode',
+  ),
 };

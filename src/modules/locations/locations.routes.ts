@@ -7,6 +7,7 @@ import {
   getParish,
   getPlace,
   getZone,
+  getLocationByCode,
   listCountries,
   listIslands,
   listMunicipalities,
@@ -20,7 +21,7 @@ export async function locationsRoutes(server: FastifyInstance) {
     schema: listCountries,
     handler: locationsControllers.listCountries,
   });
-  server.get('/countries/:id', {
+  server.get('/countries/:code', {
     schema: getCountry,
     handler: locationsControllers.getCountry,
   });
@@ -29,7 +30,7 @@ export async function locationsRoutes(server: FastifyInstance) {
     schema: listIslands,
     handler: locationsControllers.listIslands,
   });
-  server.get('/islands/:id', {
+  server.get('/islands/:code', {
     schema: getIsland,
     handler: locationsControllers.getIsland,
   });
@@ -38,7 +39,7 @@ export async function locationsRoutes(server: FastifyInstance) {
     schema: listMunicipalities,
     handler: locationsControllers.listMunicipalities,
   });
-  server.get('/municipalities/:id', {
+  server.get('/municipalities/:code', {
     schema: getMunicipality,
     handler: locationsControllers.getMunicipality,
   });
@@ -47,7 +48,7 @@ export async function locationsRoutes(server: FastifyInstance) {
     schema: listParishes,
     handler: locationsControllers.listParishes,
   });
-  server.get('/parishes/:id', {
+  server.get('/parishes/:code', {
     schema: getParish,
     handler: locationsControllers.getParish,
   });
@@ -56,7 +57,7 @@ export async function locationsRoutes(server: FastifyInstance) {
     schema: listZones,
     handler: locationsControllers.listZones,
   });
-  server.get('/zones/:id', {
+  server.get('/zones/:code', {
     schema: getZone,
     handler: locationsControllers.getZone,
   });
@@ -65,8 +66,14 @@ export async function locationsRoutes(server: FastifyInstance) {
     schema: listPlaces,
     handler: locationsControllers.listPlaces,
   });
-  server.get('/places/:id', {
+  server.get('/places/:code', {
     schema: getPlace,
     handler: locationsControllers.getPlace,
+  });
+
+  // Resolve any code to its location, whatever the level.
+  server.get('/locations/:code', {
+    schema: getLocationByCode,
+    handler: locationsControllers.getLocationByCode,
   });
 }

@@ -10,6 +10,7 @@ import {
   GetParishRequest,
   GetPlaceRequest,
   GetZoneRequest,
+  GetLocationByCodeRequest,
   ListCountriesRequest,
   ListIslandsRequest,
   ListMunicipalitiesRequest,
@@ -17,6 +18,20 @@ import {
   ListPlacesRequest,
   ListZonesRequest,
 } from './locations.schemas';
+
+async function getLocationByCode(
+  req: GetLocationByCodeRequest,
+  reply: FastifyReply,
+) {
+  const location = await locationsServices.getLocationByCode(
+    req.db,
+    req.params.code,
+  );
+
+  if (!location) throw new NotFoundError();
+
+  return reply.code(StatusCodes.OK).send({ data: location });
+}
 
 async function listCountries(req: ListCountriesRequest, reply: FastifyReply) {
   const { limit, offset } = req.query;
@@ -33,9 +48,9 @@ async function listCountries(req: ListCountriesRequest, reply: FastifyReply) {
 }
 
 async function getCountry(req: GetCountryRequest, reply: FastifyReply) {
-  const country = await locationsServices.getCountryById(
+  const country = await locationsServices.getCountryByCode(
     req.db,
-    req.params.id,
+    req.params.code,
   );
 
   if (!country) throw new NotFoundError();
@@ -59,9 +74,9 @@ async function listIslands(req: ListIslandsRequest, reply: FastifyReply) {
 }
 
 async function getIsland(req: GetIslandRequest, reply: FastifyReply) {
-  const island = await locationsServices.getIslandById(
+  const island = await locationsServices.getIslandByCode(
     req.db,
-    req.params.id,
+    req.params.code,
   );
 
   if (!island) throw new NotFoundError();
@@ -91,9 +106,9 @@ async function getMunicipality(
   req: GetMunicipalityRequest,
   reply: FastifyReply,
 ) {
-  const municipality = await locationsServices.getMunicipalityById(
+  const municipality = await locationsServices.getMunicipalityByCode(
     req.db,
-    req.params.id,
+    req.params.code,
   );
 
   if (!municipality) throw new NotFoundError();
@@ -117,9 +132,9 @@ async function listParishes(req: ListParishesRequest, reply: FastifyReply) {
 }
 
 async function getParish(req: GetParishRequest, reply: FastifyReply) {
-  const parish = await locationsServices.getParishById(
+  const parish = await locationsServices.getParishByCode(
     req.db,
-    req.params.id,
+    req.params.code,
   );
 
   if (!parish) throw new NotFoundError();
@@ -143,7 +158,7 @@ async function listZones(req: ListZonesRequest, reply: FastifyReply) {
 }
 
 async function getZone(req: GetZoneRequest, reply: FastifyReply) {
-  const zone = await locationsServices.getZoneById(req.db, req.params.id);
+  const zone = await locationsServices.getZoneByCode(req.db, req.params.code);
 
   if (!zone) throw new NotFoundError();
 
@@ -166,7 +181,7 @@ async function listPlaces(req: ListPlacesRequest, reply: FastifyReply) {
 }
 
 async function getPlace(req: GetPlaceRequest, reply: FastifyReply) {
-  const place = await locationsServices.getPlaceById(req.db, req.params.id);
+  const place = await locationsServices.getPlaceByCode(req.db, req.params.code);
 
   if (!place) throw new NotFoundError();
 
@@ -174,6 +189,7 @@ async function getPlace(req: GetPlaceRequest, reply: FastifyReply) {
 }
 
 export const locationsControllers = {
+  getLocationByCode,
   listCountries,
   getCountry,
   listIslands,
