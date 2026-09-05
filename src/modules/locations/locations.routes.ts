@@ -8,6 +8,8 @@ import {
   getPlace,
   getZone,
   getLocationByCode,
+  getLocationBreadcrumb,
+  getLocationChildren,
   getLocationStats,
   listCountries,
   listIslands,
@@ -83,5 +85,16 @@ export async function locationsRoutes(server: FastifyInstance) {
   server.get('/locations/:code', {
     schema: getLocationByCode,
     handler: locationsControllers.getLocationByCode,
+  });
+
+  // Hierarchy navigation for any code, at any level: the ancestry chain and the
+  // immediate children. Both lean on codes being prefixes of their descendants.
+  server.get('/locations/:code/breadcrumb', {
+    schema: getLocationBreadcrumb,
+    handler: locationsControllers.getLocationBreadcrumb,
+  });
+  server.get('/locations/:code/children', {
+    schema: getLocationChildren,
+    handler: locationsControllers.getLocationChildren,
   });
 }

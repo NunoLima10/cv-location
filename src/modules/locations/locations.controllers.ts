@@ -12,6 +12,8 @@ import {
   GetPlaceRequest,
   GetZoneRequest,
   GetLocationByCodeRequest,
+  GetLocationBreadcrumbRequest,
+  GetLocationChildrenRequest,
   ListCountriesRequest,
   ListIslandsRequest,
   ListMunicipalitiesRequest,
@@ -38,6 +40,42 @@ async function getLocationByCode(
   if (!location) throw new NotFoundError();
 
   return reply.code(StatusCodes.OK).send({ data: location });
+}
+
+async function getLocationBreadcrumb(
+  req: GetLocationBreadcrumbRequest,
+  reply: FastifyReply,
+) {
+  const chain = await locationsServices.getLocationBreadcrumb(
+    req.db,
+    req.params.code,
+  );
+
+  if (!chain) throw new NotFoundError();
+
+  return reply.code(StatusCodes.OK).send({ data: chain });
+}
+
+async function getLocationChildren(
+  req: GetLocationChildrenRequest,
+  reply: FastifyReply,
+) {
+  const { limit, offset } = req.query;
+  const children = await locationsServices.getLocationChildren(
+    req.db,
+    req.params.code,
+    limit,
+    offset,
+  );
+
+  if (!children) throw new NotFoundError();
+
+  const { result, total } = children;
+
+  return reply.code(StatusCodes.OK).send({
+    data: result,
+    meta: buildPaginationMeta(total, limit, offset, result.length),
+  });
 }
 
 async function listCountries(req: ListCountriesRequest, reply: FastifyReply) {
@@ -198,6 +236,8 @@ async function getPlace(req: GetPlaceRequest, reply: FastifyReply) {
 export const locationsControllers = {
   getLocationStats,
   getLocationByCode,
+  getLocationBreadcrumb,
+  getLocationChildren,
   listCountries,
   getCountry,
   listIslands,

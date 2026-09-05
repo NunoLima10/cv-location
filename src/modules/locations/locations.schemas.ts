@@ -1,6 +1,7 @@
 import { config } from '@/config';
 import { routeErrorResponses } from '@/plugins/error.handler';
 import {
+  childrenResponseExample,
   countryExample,
   dataExamples,
   islandExample,
@@ -218,6 +219,48 @@ export const getLocationByCode = {
   },
 };
 
+export const getLocationBreadcrumb = {
+  tags: ['locations'],
+  summary: 'Resolve the full ancestry of a location',
+  description:
+    'Returns the chain of locations from the country down to and including ' +
+    'the one identified by `code`, ordered from level 1 to the target level. ' +
+    'Every entry carries a `type` discriminator. Ideal for breadcrumbs and ' +
+    'cascading pickers. Responds 404 when no location carries that code.',
+  operationId: 'getLocationBreadcrumb',
+  hide: docsHidden,
+  params: codeParamSchema,
+  response: {
+    200: z
+      .object({ data: z.array(locationByCode) })
+      .meta({ example: dataExamples.breadcrumb }),
+    ...routeErrorResponses,
+  },
+};
+
+export const getLocationChildren = {
+  tags: ['locations'],
+  summary: 'List the direct children of a location',
+  description:
+    'Returns the immediate children of the location identified by `code` — ' +
+    'the next level down (e.g. the parishes of a municipality), paginated ' +
+    'with `limit` / `offset`. Empty for a level-6 place. Responds 404 when ' +
+    'no location carries that code.',
+  operationId: 'getLocationChildren',
+  hide: docsHidden,
+  params: codeParamSchema,
+  querystring: querystringSchema,
+  response: {
+    200: z
+      .object({
+        data: z.array(locationByCode),
+        meta: metadataSchema,
+      })
+      .meta({ example: childrenResponseExample }),
+    ...routeErrorResponses,
+  },
+};
+
 function getByCodeSchema<T extends z.ZodTypeAny>(
   item: T,
   tag: string,
@@ -324,6 +367,15 @@ export const getPlace = getByCodeSchema(place, 'places', 'place');
 
 export type GetLocationByCodeRequest = FastifyRequest<{
   Params: z.infer<typeof codeParamSchema>;
+}>;
+
+export type GetLocationBreadcrumbRequest = FastifyRequest<{
+  Params: z.infer<typeof codeParamSchema>;
+}>;
+
+export type GetLocationChildrenRequest = FastifyRequest<{
+  Params: z.infer<typeof codeParamSchema>;
+  Querystring: z.infer<typeof querystringSchema>;
 }>;
 
 export type ListCountriesRequest = FastifyRequest<{
