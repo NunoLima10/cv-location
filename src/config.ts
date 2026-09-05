@@ -40,11 +40,22 @@ const schema = z
     // Rate Limiting
     RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
     RATE_LIMIT_TIME_WINDOW: z.string().default('1 minute'),
+
+    // API Documentation
+    DOCS_ENABLED: z
+      .enum(['true', 'false'])
+      .optional()
+      .describe(
+        'Serve the OpenAPI spec and Swagger UI. Defaults to true outside production.',
+      ),
   })
   .transform((cfg) => ({
     ...cfg,
     isDev: cfg.NODE_ENV === 'development',
     isProd: cfg.NODE_ENV === 'production',
+    docsEnabled: cfg.DOCS_ENABLED
+      ? cfg.DOCS_ENABLED === 'true'
+      : cfg.NODE_ENV !== 'production',
   }));
 
 export type Config = z.infer<typeof schema>;

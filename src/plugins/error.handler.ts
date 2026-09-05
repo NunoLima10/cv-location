@@ -1,3 +1,4 @@
+import { errorResponseExample } from '@/shared/examples';
 import { logger } from '@/utils/logger';
 import { FastifyError, FastifyPluginAsync } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
@@ -11,18 +12,36 @@ import { z } from 'zod';
 
 const PG_ERR_UNIQUE_VIOLATION = '23505';
 
-export const errorResponseSchema = z.object({
-  error: z.object({
-    status: z.string(),
-    message: z.string(),
-    code: z.string().optional(),
-  }),
-});
+export const errorResponseSchema = z
+  .object({
+    error: z.object({
+      status: z
+        .string()
+        .describe('HTTP status code, as a string.')
+        .meta({ example: errorResponseExample.status }),
+      message: z
+        .string()
+        .describe('Human-readable explanation of what went wrong.')
+        .meta({ example: errorResponseExample.message }),
+      code: z
+        .string()
+        .optional()
+        .describe('Stable machine-readable error code, when available.')
+        .meta({ example: errorResponseExample.code }),
+    }),
+  })
+  .meta({
+    id: 'ErrorResponse',
+    description:
+      'Uniform error envelope. `status` mirrors the HTTP status code; ' +
+      '`code` is present for validation, conflict and internal errors.',
+  });
 
 export const routeErrorResponses = {
   400: errorResponseSchema,
   404: errorResponseSchema,
   409: errorResponseSchema,
+  429: errorResponseSchema,
   500: errorResponseSchema,
 };
 

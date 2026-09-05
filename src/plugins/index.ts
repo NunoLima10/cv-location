@@ -27,14 +27,18 @@ async function registerAllPlugins(server: FastifyInstance) {
 
   await server.register(customErrorHandler);
 
-  await server.register(swagger, {
-    title: 'CV Location API',
-    description: 'API for Cape Verde location lookup data',
-    version: '0.1.0',
-    host: config.HOST,
-    port: config.PORT,
-    path: '/docs',
-  });
+  if (config.docsEnabled) {
+    await server.register(swagger, {
+      title: 'CV Location API',
+      description:
+        'Lookup API for Cape Verde locations: countries, islands, ' +
+        'municipalities, parishes, zones and places.',
+      version: '0.1.0',
+      host: config.HOST,
+      port: config.PORT,
+      path: '/docs',
+    });
+  }
 }
 
 export const registerPlugins = fastifyPlugin(registerAllPlugins);
