@@ -41,7 +41,7 @@ export const searchQuerystring = querystringSchema.extend({
 });
 
 export const search = {
-  tags: ['search'],
+  tags: ['locations'],
   hide: config.isProd,
   querystring: searchQuerystring,
   response: {

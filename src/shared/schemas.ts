@@ -27,8 +27,8 @@ export const metadataSchema = z.object({
   hasMore: z.boolean(),
 });
 
-export const idParamSchema = z.object({
-  id: z.coerce.number().int().positive(),
+export const codeParamSchema = z.object({
+  code: z.string().min(1),
 });
 
 export function buildPaginationMeta(

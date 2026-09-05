@@ -1,6 +1,6 @@
 import { config } from '@/config';
 import { routeErrorResponses } from '@/plugins/error.handler';
-import { idParamSchema, metadataSchema, querystringSchema } from '@/shared/schemas';
+import { codeParamSchema, metadataSchema, querystringSchema } from '@/shared/schemas';
 import { FastifyRequest } from 'fastify';
 import z from 'zod';
 
@@ -76,11 +76,30 @@ function listSchema<T extends z.ZodTypeAny, Q extends z.ZodTypeAny>(
   };
 }
 
-function getByIdSchema<T extends z.ZodTypeAny>(item: T, tag: string) {
+const locationByCode = z.discriminatedUnion('type', [
+  country.extend({ type: z.literal('country') }),
+  island.extend({ type: z.literal('island') }),
+  municipality.extend({ type: z.literal('municipality') }),
+  parish.extend({ type: z.literal('parish') }),
+  zone.extend({ type: z.literal('zone') }),
+  place.extend({ type: z.literal('place') }),
+]);
+
+export const getLocationByCode = {
+  tags: ['locations'],
+  hide: config.isProd,
+  params: codeParamSchema,
+  response: {
+    200: z.object({ data: locationByCode }),
+    ...routeErrorResponses,
+  },
+};
+
+function getByCodeSchema<T extends z.ZodTypeAny>(item: T, tag: string) {
   return {
     tags: [tag],
     hide: config.isProd,
-    params: idParamSchema,
+    params: codeParamSchema,
     response: {
       200: z.object({ data: item }),
       ...routeErrorResponses,
@@ -89,13 +108,13 @@ function getByIdSchema<T extends z.ZodTypeAny>(item: T, tag: string) {
 }
 
 export const listCountries = listSchema(country, querystringSchema, 'countries');
-export const getCountry = getByIdSchema(country, 'countries');
+export const getCountry = getByCodeSchema(country, 'countries');
 
 export const listIslandsQuerystring = querystringSchema.extend({
   countryId: z.coerce.number().int().positive().optional(),
 });
 export const listIslands = listSchema(island, listIslandsQuerystring, 'islands');
-export const getIsland = getByIdSchema(island, 'islands');
+export const getIsland = getByCodeSchema(island, 'islands');
 
 export const listMunicipalitiesQuerystring = querystringSchema.extend({
   islandId: z.coerce.number().int().positive().optional(),
@@ -105,25 +124,29 @@ export const listMunicipalities = listSchema(
   listMunicipalitiesQuerystring,
   'municipalities',
 );
-export const getMunicipality = getByIdSchema(municipality, 'municipalities');
+export const getMunicipality = getByCodeSchema(municipality, 'municipalities');
 
 export const listParishesQuerystring = querystringSchema.extend({
   municipalityId: z.coerce.number().int().positive().optional(),
 });
 export const listParishes = listSchema(parish, listParishesQuerystring, 'parishes');
-export const getParish = getByIdSchema(parish, 'parishes');
+export const getParish = getByCodeSchema(parish, 'parishes');
 
 export const listZonesQuerystring = querystringSchema.extend({
   parishId: z.coerce.number().int().positive().optional(),
 });
 export const listZones = listSchema(zone, listZonesQuerystring, 'zones');
-export const getZone = getByIdSchema(zone, 'zones');
+export const getZone = getByCodeSchema(zone, 'zones');
 
 export const listPlacesQuerystring = querystringSchema.extend({
   zoneId: z.coerce.number().int().positive().optional(),
 });
 export const listPlaces = listSchema(place, listPlacesQuerystring, 'places');
-export const getPlace = getByIdSchema(place, 'places');
+export const getPlace = getByCodeSchema(place, 'places');
+
+export type GetLocationByCodeRequest = FastifyRequest<{
+  Params: z.infer<typeof codeParamSchema>;
+}>;
 
 export type ListCountriesRequest = FastifyRequest<{
   Querystring: z.infer<typeof listCountries.querystring>;
