@@ -57,6 +57,25 @@ const place = z.object({
   level: z.number(),
 });
 
+const stats = z.object({
+  total: z.number(),
+  countries: z.number(),
+  islands: z.number(),
+  municipalities: z.number(),
+  parishes: z.number(),
+  zones: z.number(),
+  places: z.number(),
+});
+
+export const getLocationStats = {
+  tags: ['locations'],
+  hide: config.isProd,
+  response: {
+    200: z.object({ data: stats }),
+    ...routeErrorResponses,
+  },
+};
+
 function listSchema<T extends z.ZodTypeAny, Q extends z.ZodTypeAny>(
   item: T,
   querystring: Q,
