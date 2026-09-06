@@ -70,6 +70,22 @@ export const locationStatsExample = {
   places: 3535,
 } as const;
 
+/**
+ * `GET /v1/locations/:code/breadcrumb` payload — the chain from the country down
+ * to the requested location, inclusive.
+ */
+export const breadcrumbExample = [
+  { type: 'country', ...countryExample },
+  { type: 'island', ...islandExample },
+  { type: 'municipality', ...municipalityExample },
+] as const;
+
+/** `GET /v1/locations/:code/children` full response example. */
+export const childrenResponseExample = {
+  data: [{ type: 'parish', ...parishExample }],
+  meta: { total: 1, limit: 20, offset: 0, hasMore: false },
+} as const;
+
 /** One ranked hit from `GET /v1/locations/search`. */
 export const searchResultExample = {
   id: 42,
@@ -116,6 +132,7 @@ export const dataExamples = {
   place: { data: placeExample },
   stats: { data: locationStatsExample },
   locationByCode: { data: { type: 'municipality', ...municipalityExample } },
+  breadcrumb: { data: breadcrumbExample },
 } as const;
 
 /** `GET /v1/locations/search` full response example. */

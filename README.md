@@ -33,7 +33,7 @@ Cabo Verde é modelado em **seis níveis hierárquicos**. Cada nível pertence a
 | 6 | **Lugar** (`place`) | Chã de Enrique | `CV111111111011110106` | 3 535 |
 | | | | **Total** | **4 040** |
 
-Assim, dado o código de um lugar, os prefixos revelam diretamente a zona, a freguesia, o concelho, a ilha e o país a que pertence — sem necessidade de *joins* para navegar a hierarquia.
+Assim, dado o código de um lugar, os prefixos revelam diretamente a zona, a freguesia, o concelho, a ilha e o país a que pertence — sem necessidade de *joins* para navegar a hierarquia. Os endpoints `/breadcrumb` (cadeia de ascendentes) e `/children` (nível seguinte) expõem essa navegação diretamente.
 
 Os níveis **1 a 3 (país, ilha, concelho)** têm **coordenadas geográficas** (`lat`, `long`). Os níveis 4 a 6 ainda não — ver [Dados relacionados e roadmap](#dados-relacionados-e-roadmap).
 
@@ -67,8 +67,8 @@ Na prática, **obter os dados "crus"** (camadas vetoriais descarregáveis, e nã
 
 ## Casos de uso
 
-- **Seletor de localização em cascata** — o utilizador escolhe ilha → concelho → freguesia → zona → lugar, com cada nível filtrado pelo anterior.
-- **Validação e normalização de moradas** — mapear texto livre para um código canónico.
+- **Seletor de localização em cascata** — o utilizador escolhe ilha → concelho → freguesia → zona → lugar, com cada nível filtrado pelo anterior (`/v1/locations/:code/children`).
+- **Validação e normalização de moradas** — mapear texto livre para um código canónico e, a partir dele, obter a cadeia completa até ao país (`/v1/locations/:code/breadcrumb`).
 - **Filtros geográficos** — listar registos por ilha ou concelho num painel ou marketplace.
 - **Autocompletar** — pesquisa textual tolerante a erros enquanto se escreve.
 - **Mapas** — centrar e agrupar por coordenadas ao nível de país/ilha/concelho.
@@ -132,6 +132,8 @@ Base: `/v1`. Todas as respostas são JSON.
 | `GET` | `/v1/zones` · `/v1/zones/:code` | Zonas — filtro `?parishId=` |
 | `GET` | `/v1/places` · `/v1/places/:code` | Lugares — filtro `?zoneId=` |
 | `GET` | `/v1/locations/:code` | Resolve **qualquer** código, em qualquer nível, e devolve-o etiquetado com o seu `type` |
+| `GET` | `/v1/locations/:code/breadcrumb` | Cadeia de ascendentes, do país até ao próprio nível, cada um etiquetado com o seu `type` |
+| `GET` | `/v1/locations/:code/children` | Filhos diretos (o nível seguinte) de qualquer código — paginado |
 | `GET` | `/v1/locations/search` | Pesquisa textual em todos os 6 níveis |
 | `GET` | `/v1/locations/stats` | Contagem de registos por nível |
 | `GET` | `/healthcheck` | Estado do serviço |
@@ -155,6 +157,52 @@ Erros:
 { "error": { "status": "404", "message": "Not Found", "code": "..." } }
 ```
 
+### Navegar a hierarquia
+
+Como o código de cada nível é prefixo do nível abaixo, dois endpoints resolvem a navegação sem o cliente ter de manipular códigos nem encadear pedidos.
+
+#### `GET /v1/locations/:code/breadcrumb`
+
+Devolve a **cadeia de ascendentes** de `:code`, do país (nível 1) até ao próprio `:code`, inclusive, ordenada do nível mais alto para o mais baixo. Cada entrada traz o campo `type` (`country` … `place`) para se saber a que nível corresponde. Útil para *breadcrumbs* de UI e para expandir um código guardado na sua cadeia legível completa.
+
+Responde `404` se nenhum registo tiver esse código (ou se o comprimento do código não corresponder a nenhum nível).
+
+```bash
+curl "http://localhost:4000/v1/locations/CV111/breadcrumb"
+```
+
+```jsonc
+{
+  "data": [
+    { "type": "country",      "code": "CV",    "name": "Cabo Verde",     "level": 1, /* … */ },
+    { "type": "island",       "code": "CV1",   "name": "Santo Antão",    "level": 2, /* … */ },
+    { "type": "municipality", "code": "CV111", "name": "Ribeira Grande", "level": 3, /* … */ }
+  ]
+}
+```
+
+#### `GET /v1/locations/:code/children`
+
+Devolve os **filhos diretos** de `:code` — o nível imediatamente abaixo (as ilhas de um país, as freguesias de um concelho, etc.), cada um etiquetado com o seu `type`. É a metade descendente do seletor em cascata.
+
+- Paginado: aceita `?limit=` (1–100, por omissão 20) e `?offset=` (por omissão 0), com o mesmo envelope `meta` das listagens.
+- Devolve `data: []` para um lugar (nível 6), que não tem filhos.
+- Responde `404` se `:code` não resolver para nenhum registo.
+
+```bash
+curl "http://localhost:4000/v1/locations/CV111/children?limit=50"
+```
+
+```jsonc
+{
+  "data": [
+    { "type": "parish", "code": "CV111111", "name": "N. S. Rosário", "level": 4, /* … */ }
+    // …
+  ],
+  "meta": { "total": 4, "limit": 50, "offset": 0, "hasMore": false }
+}
+```
+
 ### Exemplos
 
 ```bash
@@ -166,6 +214,12 @@ curl "http://localhost:4000/v1/municipalities?islandId=7&limit=50"
 
 # Resolver um código qualquer
 curl "http://localhost:4000/v1/locations/CV111"
+
+# Trilho completo de um lugar: país → ilha → concelho → freguesia → zona → lugar
+curl "http://localhost:4000/v1/locations/CV111111111011110101/breadcrumb"
+
+# Filhos diretos de um concelho (as suas freguesias)
+curl "http://localhost:4000/v1/locations/CV111/children?limit=50"
 
 # Pesquisa tolerante a acentos e erros, só ao nível do lugar (level=6)
 curl "http://localhost:4000/v1/locations/search?q=cha+de+enrike&level=6"

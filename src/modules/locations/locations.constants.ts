@@ -17,3 +17,12 @@ export const LOCATION_STATS_TOTAL = Object.values(LOCATION_STATS).reduce(
   (sum, n) => sum + n,
   0,
 );
+
+/**
+ * Public-code length for each hierarchy level (index 0 → level 1 country … index
+ * 5 → level 6 place). Every level's code is a prefix of the level below, so a
+ * code's length alone identifies its level, and slicing these lengths off the
+ * front yields every ancestor code without a single join. See the data model in
+ * the README.
+ */
+export const CODE_LENGTH_BY_LEVEL = [2, 3, 5, 8, 13, 20] as const;
