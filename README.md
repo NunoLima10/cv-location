@@ -67,8 +67,8 @@ Na prática, **obter os dados "crus"** (camadas vetoriais descarregáveis, e nã
 
 ## Casos de uso
 
-- **Seletor de localização em cascata** — o utilizador escolhe ilha → concelho → freguesia → zona → lugar, com cada nível filtrado pelo anterior.
-- **Validação e normalização de moradas** — mapear texto livre para um código canónico.
+- **Seletor de localização em cascata** — o utilizador escolhe ilha → concelho → freguesia → zona → lugar, com cada nível filtrado pelo anterior (`/v1/locations/:code/children`).
+- **Validação e normalização de moradas** — mapear texto livre para um código canónico e, a partir dele, obter a cadeia completa até ao país (`/v1/locations/:code/breadcrumb`).
 - **Filtros geográficos** — listar registos por ilha ou concelho num painel ou marketplace.
 - **Autocompletar** — pesquisa textual tolerante a erros enquanto se escreve.
 - **Mapas** — centrar e agrupar por coordenadas ao nível de país/ilha/concelho.
@@ -155,6 +155,52 @@ Erros:
 
 ```jsonc
 { "error": { "status": "404", "message": "Not Found", "code": "..." } }
+```
+
+### Navegar a hierarquia
+
+Como o código de cada nível é prefixo do nível abaixo, dois endpoints resolvem a navegação sem o cliente ter de manipular códigos nem encadear pedidos.
+
+#### `GET /v1/locations/:code/breadcrumb`
+
+Devolve a **cadeia de ascendentes** de `:code`, do país (nível 1) até ao próprio `:code`, inclusive, ordenada do nível mais alto para o mais baixo. Cada entrada traz o campo `type` (`country` … `place`) para se saber a que nível corresponde. Útil para *breadcrumbs* de UI e para expandir um código guardado na sua cadeia legível completa.
+
+Responde `404` se nenhum registo tiver esse código (ou se o comprimento do código não corresponder a nenhum nível).
+
+```bash
+curl "http://localhost:4000/v1/locations/CV111/breadcrumb"
+```
+
+```jsonc
+{
+  "data": [
+    { "type": "country",      "code": "CV",    "name": "Cabo Verde",     "level": 1, /* … */ },
+    { "type": "island",       "code": "CV1",   "name": "Santo Antão",    "level": 2, /* … */ },
+    { "type": "municipality", "code": "CV111", "name": "Ribeira Grande", "level": 3, /* … */ }
+  ]
+}
+```
+
+#### `GET /v1/locations/:code/children`
+
+Devolve os **filhos diretos** de `:code` — o nível imediatamente abaixo (as ilhas de um país, as freguesias de um concelho, etc.), cada um etiquetado com o seu `type`. É a metade descendente do seletor em cascata.
+
+- Paginado: aceita `?limit=` (1–100, por omissão 20) e `?offset=` (por omissão 0), com o mesmo envelope `meta` das listagens.
+- Devolve `data: []` para um lugar (nível 6), que não tem filhos.
+- Responde `404` se `:code` não resolver para nenhum registo.
+
+```bash
+curl "http://localhost:4000/v1/locations/CV111/children?limit=50"
+```
+
+```jsonc
+{
+  "data": [
+    { "type": "parish", "code": "CV111111", "name": "N. S. Rosário", "level": 4, /* … */ }
+    // …
+  ],
+  "meta": { "total": 4, "limit": 50, "offset": 0, "hasMore": false }
+}
 ```
 
 ### Exemplos
